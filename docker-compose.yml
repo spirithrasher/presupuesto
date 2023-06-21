@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  web:
+    build: .
+    container_name: web_sisema_presupuesto
+    ports:
+      - 8000:80
+    volumes:
+      - .:/opt/data
+    links:
+      - mysql
+  mysql:
+    image: mysql:5.7
+    container_name: mysql_sistema_presupuesto # nombre de referencia del servicio
+    restart: unless-stopped # si tiene algun problema, reinicialo
+    ports: 
+      - 3306:3306 
+    volumes:
+      - ./mysql:/var/lib/mysql # carpeta local:carpeta de config de mysql
+    environment:
+      MYSQL_DATABASE: presupuesto
+      MYSQL_ROOT_PASSWORD: Kalambre6255.
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
