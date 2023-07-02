@@ -18,7 +18,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4"> 
-                            <!-- <a class="btn btn-outline-primary" href="{{ route('admin.listado.users') }}" role="button">Nuevo Usuario</a> -->
+                            <a class="btn btn-outline-primary" href="{{ route('admin.registrar.user') }}" role="button">Nuevo Usuario</a>
                         </div>
                     </div> 
                     <div class="row">
@@ -29,7 +29,7 @@
                                     <th scope="col">ID</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Email</th>
-                                    <th scope="col">Rol</th>
+                                    <th scope="col">Perfil</th>
                                     <th scope="col">Estado</th>
                                     <th scope="col">Actions</th>
                                     </tr>
@@ -43,7 +43,7 @@
         </div>
     </div>
 </div>
-<!-- <script>
+<script>
     $(document).ready( function () {
         $('#datatables-example').DataTable({
             dom: 'Bfrtip',
@@ -52,12 +52,12 @@
             ],
             processing: true,
             serverSide: true,
-            ajax: "{{ url('admin/users') }}",
+            ajax: "{{ url('admin/listado/users') }}",
             columns: [
                     { data: 'id', name: 'id' },
                     { data: 'name', name: 'nombre' },
                     { data: 'email', name: 'email' },
-                    { data: 'rol', name: 'Rol' },
+                    { data: 'perfil_id', name: 'perfil_id' },
                     { data: 'habilitado', name: 'habilitado' },
                     {data: 'actions', name: 'actions', orderable: false, searchable: false},
 
@@ -67,7 +67,7 @@
             },
        });
     });
-  </script> -->
+  </script>
 @endsection
 
 

@@ -61,8 +61,8 @@ RUN mkdir -p /opt/data/public && \
     ln -s /opt/data/public $APP_HOME
 
 #--------traer config de apache--------
-# RUN rm /etc/apache2/sites-enabled/000-default.conf
-# ADD 000-default.conf /etc/apache2/sites-enabled
+RUN rm /etc/apache2/sites-enabled/000-default.conf
+ADD 000-default.conf /etc/apache2/sites-enabled
 #===============================================
 
 RUN a2enmod rewrite

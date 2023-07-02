@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -43,14 +44,39 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function perfiles(){
+
+        return $this->hasOne('App\Models\Perfiles','id','perfil_id');
+    }
+
+    public function validaredit($datos){
+
+        $rules = array();
+        if(isset($datos['check_pass'])){
+            $rules = array('password' => ['required', 'string', 'min:8', 'confirmed']);
+        }
+        
+
+        $reglas = array(
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'perfil_id' => ['required']
+        );
+        
+        $validaciones = array_merge($reglas,$rules);
+        $validator = Validator::make($datos,$validaciones);
+        return $validator;
+    }
 
     public function guardar($datos){
-        
-        $user = User::create([
-                'name' => $datos['name'],
-                'email' => $datos['email'],
-                'password' => Hash::make($datos['password']),
-                'pefil_id' => $datos['perfil_id']
-            ]);
+        Log::info(__METHOD__."::".__LINE__." GUARDAR ::: ".print_r($datos,1));
+
+        $this->name = (isset($datos['name']))? $datos['name'] : "";
+        $this->email = (isset($datos['email']))? $datos['email'] : "";
+        $this->password = (isset($datos['password']))? Hash::make($datos['password']) : "";
+        $this->perfil_id = (isset($datos['perfil_id']))? $datos['perfil_id'] : "";
+        $this->save();
     }
+
+
 }
