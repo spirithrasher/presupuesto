@@ -4,9 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Imports\PresupuestoImport;
 use App\Models\User;
 use App\Models\Perfiles;
+use App\Models\ArchivosCarga;
+use App\Models\RegistroCarga;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use DataTables;
 
 class AdministracionController extends Controller
@@ -136,5 +142,57 @@ class AdministracionController extends Controller
         return redirect()->route('admin.users')
                         ->with('success','Usuario Deshabilitado correctamente.');
     }
+
+
+    public function cargarpresupuesto(Request $request){
+        
+        
+
+        if ($request->isMethod('post')) {
+            
+            
+
+            $reglas = array(
+                'file' => 'required|mimes:xls,xlsx',
+            );
+            
+            $validator = Validator::make($request->all(),$reglas);
+            
+            Log::info(__METHOD__."::".__LINE__." ::: ".print_r($validator->fails(),1));
+            if ($validator->fails()) {
+                return redirect('carga/presupuesto')
+                            ->withErrors($validator)
+                            ->withInput();
+            }else{
+                Log::info(__METHOD__."::".__LINE__." ::: ".print_r( $request->file(),1));
+                // Log::info(__METHOD__."::".__LINE__." ::: ".print_r($request->all(),1));
+                $name = $request->file('file')->getClientOriginalName();
+                $path = $request->file('file')->store('public/carga_presupuesto');
+
+                $archivo = new ArchivosCarga();
+                $archivo->name_file = $name;
+                $archivo->path = $path;
+                $archivo->tipo_carga = config("constants.PRESUPUESTO");
+                $archivo->user_carga = Auth::id();
+                $archivo->save();
+
+                $registrocarga = new RegistroCarga();
+                $registrocarga->archivo_id = $archivo->id;
+                $registrocarga->tipo_carga = config("constants.PRESUPUESTO");
+                $registrocarga->fecha_carga = date('Y-m-d');
+                $registrocarga->anno = date('Y');
+                $registrocarga->save();
+
+                $file = ArchivosCarga::find($archivo->id);
+                $import = Excel::import(new PresupuestoImport($registrocarga->id), $file->path);
+                Storage::delete($file->path);
+                return back()->with('success', 'Importación Exitosa');
+    
+            }
+            
+        }
+        return view('admin/cargarpresupuesto');
+    }
+
 
 }

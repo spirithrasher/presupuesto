@@ -26,5 +26,6 @@ Route::get('admin/registrar/user', [App\Http\Controllers\AdministracionControlle
 Route::post('admin/registrar/user', [App\Http\Controllers\AdministracionController::class, 'registrarusers'])->name('admin.registrar.user');
 Route::get('admin/editar/user/{id}', [App\Http\Controllers\AdministracionController::class, 'editaruser'])->name('admin.editar.user');
 Route::post('admin/editar/user/{id}', [App\Http\Controllers\AdministracionController::class, 'editaruser'])->name('admin.editar.user');
-
+Route::get('carga/presupuesto', [App\Http\Controllers\AdministracionController::class, 'cargarpresupuesto'])->name('carga.presupuesto');
+Route::post('carga/presupuesto', [App\Http\Controllers\AdministracionController::class, 'cargarpresupuesto'])->name('carga.presupuesto');   
 
