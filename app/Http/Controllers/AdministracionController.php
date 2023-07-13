@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Imports\PresupuestoImport;
+use App\Imports\CostosImport;
 use App\Models\User;
 use App\Models\Perfiles;
 use App\Models\ArchivosCarga;
 use App\Models\RegistroCarga;
+use App\Models\Presupuesto;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -146,14 +148,12 @@ class AdministracionController extends Controller
 
     public function cargarpresupuesto(Request $request){
         
-        
-
         if ($request->isMethod('post')) {
             
-            
-
             $reglas = array(
                 'file' => 'required|mimes:xls,xlsx',
+                'periodo' => 'required',
+                'estado' => 'required'
             );
             
             $validator = Validator::make($request->all(),$reglas);
@@ -165,33 +165,136 @@ class AdministracionController extends Controller
                             ->withInput();
             }else{
                 Log::info(__METHOD__."::".__LINE__." ::: ".print_r( $request->file(),1));
-                // Log::info(__METHOD__."::".__LINE__." ::: ".print_r($request->all(),1));
+                Log::info(__METHOD__."::".__LINE__." ::: ".print_r($request->all(),1));
+                $post = $request->all();
                 $name = $request->file('file')->getClientOriginalName();
                 $path = $request->file('file')->store('public/carga_presupuesto');
+
+                $existeperiodo = RegistroCarga::where('periodo','=',$post['periodo'])->first();
+                if(isset($existeperiodo->id)){
+                    if($existeperiodo->estado == config("constants.CERRADA_NO")){
+                        Presupuesto::where('carga_id','=',$existeperiodo->id)->delete();
+                        ArchivosCarga::find($existeperiodo->archivo_id)->delete();
+                        RegistroCarga::find($existeperiodo->id)->delete();
+
+                        $archivo = new ArchivosCarga();
+                        $archivo->name_file = $name;
+                        $archivo->path = $path;
+                        $archivo->tipo_carga = config("constants.PRESUPUESTO");
+                        $archivo->user_carga = Auth::id();
+                        $archivo->save();
+
+                        $registrocarga = new RegistroCarga();
+                        $registrocarga->archivo_id = $archivo->id;
+                        $registrocarga->tipo_carga = config("constants.PRESUPUESTO");
+                        $registrocarga->fecha_carga = date('Y-m-d');
+                        $registrocarga->anno = date('Y');
+                        $registrocarga->periodo = $post['periodo'];
+                        $registrocarga->estado = $post['estado'];
+                        $registrocarga->save();
+
+                        $file = ArchivosCarga::find($archivo->id);
+                        $import = Excel::import(new PresupuestoImport($registrocarga->id), $file->path);
+                        Storage::delete($file->path);
+                        return back()->with('success', 'Importación Exitosa');
+                    }else{
+                        return back()->with('success', 'El Periodo ya esta Cerrado');
+                    }
+                }else{
+
+                    $archivo = new ArchivosCarga();
+                    $archivo->name_file = $name;
+                    $archivo->path = $path;
+                    $archivo->tipo_carga = config("constants.PRESUPUESTO");
+                    $archivo->user_carga = Auth::id();
+                    $archivo->save();
+
+                    $registrocarga = new RegistroCarga();
+                    $registrocarga->archivo_id = $archivo->id;
+                    $registrocarga->tipo_carga = config("constants.PRESUPUESTO");
+                    $registrocarga->fecha_carga = date('Y-m-d');
+                    $registrocarga->anno = date('Y');
+                    $registrocarga->periodo = $post['periodo'];
+                    $registrocarga->estado = $post['estado'];
+                    $registrocarga->save();
+
+                    $file = ArchivosCarga::find($archivo->id);
+                    $import = Excel::import(new PresupuestoImport($registrocarga->id), $file->path);
+                    Storage::delete($file->path);
+                    return back()->with('success', 'Importación Exitosa');
+                }
+            }
+            
+        }
+        $estado = array(config("constants.CERRADA_SI") => "Si",config("constants.CERRADA_NO") => "No" );
+        return view('admin/cargarpresupuesto')
+                ->with('estado',$estado);
+    }
+
+    public function listadocargapresupuesto(Request $request){
+        if ($request->ajax()) {
+            $data = RegistroCarga::select('id','periodo','fecha_carga','estado')->where('tipo_carga','=',config("constants.PRESUPUESTO"))->get();
+            return Datatables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('estado', function($row){
+                        
+                        $estado = ($row->estado == 1)? "Si":"No";
+                        return $estado;
+                    })
+                    ->rawColumns(['actions'])
+                    ->make(true);
+        }
+
+        return view('admin/listadocargapresupuesto');
+    }
+
+    public function cargarcostos(Request $request){
+        if ($request->isMethod('post')) {
+            
+            $reglas = array(
+                'file' => 'required|mimes:xls,xlsx',
+            );
+            
+            $validator = Validator::make($request->all(),$reglas);
+            
+            Log::info(__METHOD__."::".__LINE__." ::: ".print_r($validator->fails(),1));
+            if ($validator->fails()) {
+                return redirect('cargar/costos')
+                            ->withErrors($validator)
+                            ->withInput();
+            }else{
+                Log::info(__METHOD__."::".__LINE__." ::: ".print_r( $request->file(),1));
+                Log::info(__METHOD__."::".__LINE__." ::: ".print_r($request->all(),1));
+                $post = $request->all();
+                $name = $request->file('file')->getClientOriginalName();
+                $path = $request->file('file')->store('public/carga_costos');
 
                 $archivo = new ArchivosCarga();
                 $archivo->name_file = $name;
                 $archivo->path = $path;
-                $archivo->tipo_carga = config("constants.PRESUPUESTO");
+                $archivo->tipo_carga = config("constants.COSTOS");
                 $archivo->user_carga = Auth::id();
                 $archivo->save();
 
                 $registrocarga = new RegistroCarga();
                 $registrocarga->archivo_id = $archivo->id;
-                $registrocarga->tipo_carga = config("constants.PRESUPUESTO");
+                $registrocarga->tipo_carga = config("constants.COSTOS");
                 $registrocarga->fecha_carga = date('Y-m-d');
                 $registrocarga->anno = date('Y');
+                $registrocarga->periodo = isset($post['periodo'])?$post['periodo']:NULL;
+                $registrocarga->estado = isset($post['estado'])?$post['estado']:NULL;
                 $registrocarga->save();
 
                 $file = ArchivosCarga::find($archivo->id);
-                $import = Excel::import(new PresupuestoImport($registrocarga->id), $file->path);
+                $import = Excel::import(new CostosImport(), $file->path);
                 Storage::delete($file->path);
                 return back()->with('success', 'Importación Exitosa');
-    
+                
             }
             
         }
-        return view('admin/cargarpresupuesto');
+        // $estado = array(config("constants.CERRADA_SI") => "Si",config("constants.CERRADA_NO") => "No" );
+        return view('admin/cargarcostos');
     }
 
 

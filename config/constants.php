@@ -1,4 +1,6 @@
 <?php return [ 
     'PRESUPUESTO' => 1, 
-    'CONSOLIDADO' => 2 
+    'COSTOS' => 2,
+    'CERRADA_SI' => 1,
+    'CERRADA_NO' => 2
 ];

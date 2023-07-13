@@ -26,36 +26,13 @@
                 </div>
             @endif
             <div class="card">
-                <div class="card-header">Carga de Periodo</div>
+                <div class="card-header">Carga de Costos</div>
 
                 <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data" id="upload-file" action="{{ route('carga.presupuesto') }}" >
+                    <form method="POST" enctype="multipart/form-data" id="upload-file" action="{{ route('cargar.costos') }}" >
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="formFile" class="form-label">Periodo <small><b>Ej: 202301</b></small></label>
-                                            <input class="form-control @error('periodo') is-invalid @enderror"" type="text" id="periodo" name="periodo">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="formFile" class="form-label">Cerrado</label>
-                                            <select class="form-select @error('estado') is-invalid @enderror" id="estado" name="estado" >
-                                                <option value="">Seleccione</option>
-                                                @php $estadocarga = (old('estado'))? old('estado') : "" @endphp
-                                                @foreach($estado as $k => $e)
-                                                    @php $selected_e = ($estadocarga == $k)?"selected":"" @endphp
-                                                    <option value="{{$k}}" {{$selected_e}}>{{$e}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                
                                 <div class="mb-3">
                                     <label for="formFile" class="form-label">Subir Planilla</label>
                                     <input class="form-control  @error('file') is-invalid @enderror"" type="file" id="file" name="file">
@@ -76,7 +53,7 @@
                 </div>
             </div>
 
-            @include('admin.listadocargapresupuesto')
+            <!-- @include('admin.listadocargapresupuesto') -->
         </div>
     </div>
 </div>
