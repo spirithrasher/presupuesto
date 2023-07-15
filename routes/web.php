@@ -31,3 +31,8 @@ Route::post('carga/presupuesto', [App\Http\Controllers\AdministracionController:
 Route::get('listado/carga/presupuesto', [App\Http\Controllers\AdministracionController::class, 'listadocargapresupuesto'])->name('admin.listadocargapresupuesto');    
 Route::get('cargar/costos', [App\Http\Controllers\AdministracionController::class, 'cargarcostos'])->name('cargar.costos');
 Route::post('cargar/costos', [App\Http\Controllers\AdministracionController::class, 'cargarcostos'])->name('cargar.costos');  
+Route::get('listado/empresas', [App\Http\Controllers\AdministracionController::class, 'listadoempresas'])->name('admin.listadoempresas');    
+Route::get('nueva/empresa', [App\Http\Controllers\AdministracionController::class, 'nuevaempresa'])->name('admin.nuevaempresa');    
+Route::post('nueva/empresa', [App\Http\Controllers\AdministracionController::class, 'nuevaempresa'])->name('admin.nuevaempresa');    
+Route::get('editar/empresa/{id}', [App\Http\Controllers\AdministracionController::class, 'editarempresa'])->name('admin.editarempresa');    
+Route::post('editar/empresa/{id}', [App\Http\Controllers\AdministracionController::class, 'editarempresa'])->name('admin.editarempresa');    

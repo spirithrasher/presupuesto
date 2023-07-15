@@ -74,8 +74,11 @@
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Administración
                                 </a>
-
+                                
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('admin.listadoempresas') }}">
+                                        {{ __('Empresas') }}
+                                    </a>
                                     <a class="dropdown-item" href="{{ route('admin.listado.users') }}">
                                         {{ __('Usuarios') }}
                                     </a>

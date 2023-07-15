@@ -11,6 +11,7 @@ use App\Models\Perfiles;
 use App\Models\ArchivosCarga;
 use App\Models\RegistroCarga;
 use App\Models\Presupuesto;
+use App\Models\Empresas;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -295,6 +296,89 @@ class AdministracionController extends Controller
         }
         // $estado = array(config("constants.CERRADA_SI") => "Si",config("constants.CERRADA_NO") => "No" );
         return view('admin/cargarcostos');
+    }
+
+
+    // EMPRESAS
+
+    public function listadoempresas(Request $request){
+        if ($request->ajax()) {
+            $data = Empresas::select('id','cod_empresa','nombre','activo')->get();
+            return Datatables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('activo', function($row){
+                        
+                        $estado = ($row->activo == config("constants.ACTIVO_SI"))? "Si":"No";
+                        return $estado;
+                    })->addColumn('actions', function($row){
+                    
+                        $btn = '<a class="btn btn-outline-primary" href='.route('admin.editarempresa',["id" => $row->id]).' role="button">Editar</a> ';
+                        // if($row->habilitado == 1){
+                        //     $btn .= '<a class="btn btn-outline-danger" href="'.route('admin.user.deshabilitar', ['id' => $row->id]).'" role="button">Deshabilitar</a> ';
+                        // }else{
+                        //     $btn .= '<a class="btn btn-outline-success" href="'.route('admin.user.habilitar', ['id' => $row->id]).'" role="button">Habilitar</a> ';
+                        // }
+                        
+                        return $btn;
+                    })
+                    ->rawColumns(['actions'])
+                    ->make(true);
+        }
+
+        return view('admin/listadoempresas');
+    }
+
+    public function nuevaempresa(Request $request){
+        $empresas = new Empresas();
+
+        if ($request->isMethod('post')) {
+            
+            Log::info(__METHOD__."::".__LINE__." ::: ".print_r($request->all(),1));
+            $validator = $empresas->validar($request->all());
+            
+            if ($validator->fails()) {
+                
+                return redirect('nueva/empresa')
+                            ->withErrors($validator)
+                            ->withInput();
+            }else{
+                // dd($post);
+                $empresas->guardar($request->all());
+                return redirect('listado/empresas')
+                        ->with('success','Empresa creada correctamente.');   
+            }
+        }
+
+        $estado = array(config("constants.ACTIVO_SI") => "Sí" , config("constants.ACTIVO_NO") => "No");
+        return view('admin/nuevaempresa')
+                ->with('estado',$estado);
+    }
+
+    public function editarempresa(Request $request, $id){
+        $empresa = Empresas::find($id);
+
+        if ($request->isMethod('post')) {
+            
+            Log::info(__METHOD__."::".__LINE__." ::: ".print_r($request->all(),1));
+            $validator = $empresa->validar($request->all());
+            
+            if ($validator->fails()) {
+                
+                return redirect('editar/empresa/'.$id)
+                            ->withErrors($validator)
+                            ->withInput();
+            }else{
+                // dd($post);
+                $empresa->guardar($request->all());
+                return redirect('listado/empresas')
+                        ->with('success','Empresa Editada correctamente.');   
+            }
+        }
+
+        $estado = array(config("constants.ACTIVO_SI") => "Sí" , config("constants.ACTIVO_NO") => "No");
+        return view('admin/editarempresa')
+                ->with('empresa',$empresa)
+                ->with('estado',$estado);
     }
 
 

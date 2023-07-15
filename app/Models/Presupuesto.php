@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Presupuesto extends Model
 {
+    //PERIODO
     use HasFactory;
     protected $table = 'presupuesto';
 
