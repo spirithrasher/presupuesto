@@ -79,6 +79,9 @@
                                     <a class="dropdown-item" href="{{ route('admin.listadoempresas') }}">
                                         {{ __('Empresas') }}
                                     </a>
+                                    <a class="dropdown-item" href="{{ route('admin.listadocentroscostos') }}">
+                                        {{ __('Centros Costos') }}
+                                    </a>
                                     <a class="dropdown-item" href="{{ route('admin.listado.users') }}">
                                         {{ __('Usuarios') }}
                                     </a>
