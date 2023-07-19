@@ -113,7 +113,7 @@ class AdministracionController extends Controller
                 
                 Log::info(__METHOD__."::".__LINE__." ::: ".print_r($request->all(),1));
                 $user->guardaredicion($request->all());
-                return redirect()->route('aadmin.listado.users')
+                return redirect()->route('admin.listado.users')
                             ->with('success','Usuario editado correctamente.');
                 
 

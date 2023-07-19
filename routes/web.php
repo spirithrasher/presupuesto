@@ -41,3 +41,7 @@ Route::get('nuevo/centrocosto', [App\Http\Controllers\AdministracionController::
 Route::post('nuevo/centrocosto', [App\Http\Controllers\AdministracionController::class, 'nuevocentrocosto'])->name('admin.nuevocentrocosto');    
 Route::get('editar/centrocosto/{id}', [App\Http\Controllers\AdministracionController::class, 'editarcentrocosto'])->name('admin.editarcentrocosto');    
 Route::post('editar/centrocosto/{id}', [App\Http\Controllers\AdministracionController::class, 'editarcentrocosto'])->name('admin.editarcentrocosto');    
+
+
+Route::get('costosempresa', [App\Http\Controllers\CostosController::class, 'costosempresa'])->name('costosempresa');    
+Route::post('costosempresa', [App\Http\Controllers\CostosController::class, 'costosempresa'])->name('costosempresa');    
